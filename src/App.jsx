@@ -611,29 +611,20 @@ function QRModal({ onClose }) {
   );
 }
 
+// Googleフォーム URL(ご意見・ご感想用)
+const FEEDBACK_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeWqyPLKJOvCAW7oYzZh6SesF2I3uC-R-YDXANWcdQXhVw35g/viewform";
+
 function FeedbackView({ onBack }) {
-  const [feedback, setFeedback] = useState({ name: '', specialty: '', comment: '', rating: 0 });
-  const [feedbackSent, setFeedbackSent] = useState(false);
-  const handleSubmit = () => {
-    console.log('フィードバック送信:', { ...feedback, timestamp: new Date().toISOString() });
-    setFeedbackSent(true);
+  const handleOpenForm = () => {
+    window.open(FEEDBACK_FORM_URL, '_blank', 'noopener,noreferrer');
   };
-  if (feedbackSent) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-amber-50 flex items-center justify-center p-6">
-        <div className="bg-white rounded-3xl shadow-xl p-10 max-w-md w-full text-center">
-          <div className="inline-flex p-4 bg-emerald-100 rounded-full mb-4"><CheckCircle2 className="w-12 h-12 text-emerald-600"/></div>
-          <h2 className="text-2xl font-bold text-stone-800 mb-3" style={{fontFamily: '"Hiragino Mincho ProN", serif'}}>ありがとうございました</h2>
-          <p className="text-stone-600 mb-6">貴重なご意見をいただき<br/>誠にありがとうございました。<br/>今後の研究の参考にさせていただきます。</p>
-          <button onClick={onBack} className="px-6 py-3 bg-stone-800 text-white font-bold rounded-2xl hover:bg-stone-900 transition-all">ホームへ戻る</button>
-        </div>
-      </div>
-    );
-  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-stone-50 to-amber-50">
       <div className="max-w-2xl mx-auto px-6 py-10">
-        <button onClick={onBack} className="flex items-center gap-1 text-stone-600 hover:text-stone-900 mb-6 text-sm"><ArrowLeft className="w-4 h-4"/> 戻る</button>
+        <button onClick={onBack} className="flex items-center gap-1 text-stone-600 hover:text-stone-900 mb-6 text-sm">
+          <ArrowLeft className="w-4 h-4"/> 戻る
+        </button>
         <div className="bg-white rounded-3xl shadow-xl border border-stone-100 overflow-hidden">
           <div className="px-6 py-5 bg-gradient-to-r from-stone-800 to-stone-900 text-white">
             <div className="flex items-center gap-3">
@@ -644,33 +635,63 @@ function FeedbackView({ onBack }) {
               </div>
             </div>
           </div>
-          <div className="p-6 space-y-5">
-            <div>
-              <label className="block text-sm font-bold text-stone-700 mb-2">総合評価</label>
-              <div className="flex gap-2">
-                {[1,2,3,4,5].map((n) => (
-                  <button key={n} onClick={() => setFeedback({ ...feedback, rating: n })} className={`flex-1 py-3 rounded-xl border-2 transition-all font-bold ${feedback.rating >= n ? 'border-amber-400 bg-amber-50 text-amber-700' : 'border-stone-200 text-stone-400 hover:border-stone-300'}`}>{n}</button>
-                ))}
+
+          <div className="p-8 space-y-6">
+            {/* 案内メッセージ */}
+            <div className="text-center">
+              <div className="inline-flex p-4 bg-amber-100 rounded-2xl mb-4">
+                <MessageSquare className="w-10 h-10 text-amber-700"/>
               </div>
-              <div className="flex justify-between text-xs text-stone-500 mt-1.5 px-1"><span>改善が必要</span><span>非常に良い</span></div>
+              <h2 className="text-2xl font-bold text-stone-800 mb-3" style={{fontFamily: '"Hiragino Mincho ProN", serif'}}>
+                Googleフォームで<br/>ご意見をお聞かせください
+              </h2>
+              <p className="text-stone-600 leading-relaxed">
+                先生方の貴重なご意見・ご感想を<br/>
+                今後の研究の参考にさせていただきます。<br/>
+                <span className="text-sm text-stone-500">所要時間: 約1〜2分</span>
+              </p>
             </div>
-            <div>
-              <label className="block text-sm font-bold text-stone-700 mb-2">お名前 <span className="text-stone-400 font-normal">(任意)</span></label>
-              <input type="text" value={feedback.name} onChange={(e) => setFeedback({ ...feedback, name: e.target.value })} placeholder="例: 山田 太郎" className="w-full px-4 py-3 rounded-xl border-2 border-stone-200 focus:border-amber-400 focus:outline-none transition-colors"/>
+
+            {/* フォーム内容のプレビュー */}
+            <div className="bg-amber-50 rounded-2xl p-5 space-y-2.5">
+              <div className="text-sm font-bold text-amber-900 mb-2">📋 アンケート項目</div>
+              {[
+                { label: '総合評価', desc: '5段階評価', required: true },
+                { label: 'コメント・改善提案', desc: 'ご自由にお書きください', required: true },
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-2 text-sm">
+                  <CheckCircle2 className="w-4 h-4 text-amber-600 mt-0.5 shrink-0"/>
+                  <div className="flex-1">
+                    <span className="font-medium text-stone-800">{item.label}</span>
+                    {item.required && <span className="ml-1.5 text-[10px] text-rose-600 font-bold">必須</span>}
+                    <span className="ml-2 text-stone-500 text-xs">({item.desc})</span>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div>
-              <label className="block text-sm font-bold text-stone-700 mb-2">ご専門 <span className="text-stone-400 font-normal">(任意)</span></label>
-              <input type="text" value={feedback.specialty} onChange={(e) => setFeedback({ ...feedback, specialty: e.target.value })} placeholder="例: 耳鼻咽喉科 / めまい平衡医学" className="w-full px-4 py-3 rounded-xl border-2 border-stone-200 focus:border-amber-400 focus:outline-none transition-colors"/>
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-stone-700 mb-2">コメント・改善提案</label>
-              <textarea value={feedback.comment} onChange={(e) => setFeedback({ ...feedback, comment: e.target.value })} placeholder="ご意見・ご提案・気になった点など、自由にお書きください" rows={6} className="w-full px-4 py-3 rounded-xl border-2 border-stone-200 focus:border-amber-400 focus:outline-none transition-colors resize-none"/>
-            </div>
-            <button onClick={handleSubmit} disabled={feedback.rating === 0 && !feedback.comment.trim()} className={`w-full py-3.5 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all ${feedback.rating > 0 || feedback.comment.trim() ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/30 hover:scale-[1.01]' : 'bg-stone-200 text-stone-400 cursor-not-allowed'}`}>
-              <Send className="w-4 h-4"/>送信する
+
+            {/* 送信ボタン */}
+            <button
+              onClick={handleOpenForm}
+              className="w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2.5 transition-all bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/30 hover:scale-[1.02] active:scale-[0.98] text-lg"
+            >
+              <Send className="w-5 h-5"/>
+              アンケートに回答する
             </button>
-            <p className="text-xs text-stone-500 text-center">※ 送信内容は本研究の改善のためのみに使用されます</p>
+
+            <p className="text-xs text-stone-500 text-center leading-relaxed">
+              ※ ボタンを押すとGoogleフォームが新しいタブで開きます<br/>
+              ※ ご回答内容は本研究の改善のためのみに使用されます
+            </p>
           </div>
+        </div>
+
+        {/* QRコード案内(オプション) */}
+        <div className="mt-6 bg-white/60 backdrop-blur rounded-2xl border border-white p-5 text-center">
+          <p className="text-sm text-stone-600">
+            スマートフォンから直接フォームを開きたい場合は<br/>
+            学会ポスターのQRコードをご利用ください
+          </p>
         </div>
       </div>
     </div>
